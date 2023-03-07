@@ -24,12 +24,18 @@ int ListCtor(List* list, size_t capacity)
     list->buf[list->capacity].next = -1;
     list->buf[list->capacity].prev = -1;
 
+    list->namber_elem = 0;
+
     return 0; 
 }
 
 int ListAdd(List* list, Elem_t value)
 {
-    if (list->tail == -1) return -1;
+    if (list->capacity == LIST_DES_POISON    || 
+        list->namber_elem == LIST_DES_POISON || 
+        list->tail == LIST_DES_POISON)          return -5;
+        
+    if (list->tail == -1)                       return -1;
 
     int last_elem = list->buf->prev;
 
@@ -44,16 +50,20 @@ int ListAdd(List* list, Elem_t value)
 
     list->buf->prev = last_elem;
     
-    list->size++;
+    list->namber_elem ++;
     
     return last_elem;
 }
 
 Elem_t ListDelete(List* list, size_t index)
 {
-    if (index == 0)                     return -1;  
-    if (index > list->capacity)         return -2;
-    if (list->buf[index].prev == -1)    return -3;
+    if (list->capacity == LIST_DES_POISON    || 
+        list->namber_elem == LIST_DES_POISON || 
+        list->tail == LIST_DES_POISON)          return -5;
+
+    if (index == 0)                             return -1;  
+    if (index > list->capacity)                 return -2;
+    if (list->buf[index].prev == -1)            return -3;
 
     list->buf[list->buf[index].prev].next = list->buf[index].next;
     list->buf[list->buf[index].next].prev = list->buf[index].prev;
@@ -62,16 +72,20 @@ Elem_t ListDelete(List* list, size_t index)
     list->buf[index].next   = list->tail;
     list->tail              = (int)index;
 
-    list->size--;
+    list->namber_elem --;
 
     return list->buf[index].data;
 }
 
 int ListInsert(List* list, Elem_t value, size_t index)
 {
-    if (list->tail == -1)               return -1;
-    if (index > list->capacity)         return -2;
-    if (list->buf[index].prev == -1)    return -3;
+    if (list->capacity == LIST_DES_POISON    || 
+        list->namber_elem == LIST_DES_POISON || 
+        list->tail == LIST_DES_POISON)          return -5;
+
+    if (list->tail == -1)                       return -1;
+    if (index > list->capacity)                 return -2;
+    if (list->buf[index].prev == -1)            return -3;
 
     int elem_index  =                 list->tail;
     list->tail      = list->buf[elem_index].next;
@@ -82,7 +96,7 @@ int ListInsert(List* list, Elem_t value, size_t index)
     list->buf[elem_index].prev              =              (int)index;
     list->buf[elem_index].data              =                   value;
 
-    list->size++;
+    list->namber_elem ++;
 
     return elem_index;
 
@@ -91,6 +105,15 @@ int ListInsert(List* list, Elem_t value, size_t index)
 int ListDtor(List* list)
 {
     if (list == NULL) return -1;
+
+    list->capacity = LIST_DES_POISON;
+    list->namber_elem = LIST_DES_POISON;
+    list->tail = LIST_DES_POISON;
+
+    free(list->buf);
+    list->buf = NULL;
+
+    return 0;
     
 }
 
@@ -102,7 +125,7 @@ void ListDump(List* list)
     
 
     fprintf(LogList, "    data pointer         = %p\n", list->buf);    
-    fprintf(LogList, "    size                 = %lu\n", list->size);
+    fprintf(LogList, "    namber_elem                = %lu\n", list->namber_elem);
     fprintf(LogList, "    capacity             = %lu\n", list->capacity); 
     fprintf(LogList, "    tail                 = %d\n", list->tail);
 

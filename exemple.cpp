@@ -8,21 +8,15 @@ int main()
 
     ListDump(&list);
 
-    ListAdd(&list, 10);
-    ListAdd(&list, 20);
-    ListAdd(&list, 30);
+    for (int i = 0; i <12; i++)
+    {
+        
+        printf("%d\n", ListAdd(&list, 123));
+    }
 
     ListDump(&list);
 
-    ListDelete(&list, 2);
-
-    ListDump(&list);
-
-     ListAdd(&list, 40);
-
-    ListDump(&list);
-
-    ListInsert(&list, 60, 1);
+    printf("%d\n", ListDelete(&list, 5));
 
     ListDump(&list);
 
