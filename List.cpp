@@ -176,18 +176,28 @@ int ListDtor(List* list)
 
 void ListDump(List* list)
 {
-    if (list == NULL) fputs("!!!__list == nullptr__!!!", LogList);
+    if (list == NULL) 
+    {
+        fputs("!!!__list == nullptr__!!!", LogList);
+        return;
+    }
 
     fprintf(LogList, "\n----------------------------------ListDump----------------------------------\n\n");
     
 
     fprintf(LogList, "    data pointer         = %p\n", list->buf);    
-    fprintf(LogList, "    namber_elem                = %lu\n", list->namber_elem);
+    fprintf(LogList, "    namber_elem          = %lu\n", list->namber_elem);
     fprintf(LogList, "    capacity             = %lu\n", list->capacity); 
     fprintf(LogList, "    tail                 = %d\n", list->tail);
 
 
     fprintf(LogList, "    ---------------------------------------\n\n");
+
+    if (list == NULL) 
+    {
+        fputs("!!!__list->buf == nullptr__!!!", LogList);
+        return;
+    }
 
     fputs("\t index | data | next | prev |\n", LogList);
     for (size_t index = 0; index <= list->capacity; index++)
