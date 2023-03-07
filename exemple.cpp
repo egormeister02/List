@@ -20,5 +20,8 @@ int main()
 
     ListDump(&list);
 
+    printf("%d\n", ListLogic_number(&list, 6));
+
+
     return 0;
 }

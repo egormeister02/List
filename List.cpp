@@ -102,6 +102,30 @@ int ListInsert(List* list, Elem_t value, size_t index)
 
 }
 
+int ListLogic_number(List* list, size_t index)
+{
+    if (list->capacity == LIST_DES_POISON    || 
+        list->namber_elem == LIST_DES_POISON || 
+        list->tail == LIST_DES_POISON)          return -5;
+
+    if (index == 0)                             return -1;  
+    if (index > list->capacity)                 return -2;
+    if (list->buf[index].prev == -1)            return -3;
+
+    int search = 0;
+    int logic_number = 0;
+
+    do
+    {
+        search = list->buf[search].next;
+        logic_number ++;
+    } while (search != (int)index && search != 0);
+
+    if (search == 0) return -4;
+
+    return logic_number;
+}
+
 int ListDtor(List* list)
 {
     if (list == NULL) return -1;

@@ -41,6 +41,13 @@ int ListInsert(List*, Elem_t, size_t);          // return index of inserted elem
                                                 // return  -2 if (index > capacity)
                                                 // return  -3 if try to insert after "empty" element 
                                                 // return  -5 if the List is destructed
+                        
+int ListLogic_number(List*, size_t index);      // return logical number of element at index "index" if OK (1 <= logic_number <= capacity)
+                                                // return  -1 if try to search "null" element
+                                                // return  -2 if (index > capacity)
+                                                // return  -3 if try to search "empty" element 
+                                                // return  -4 if element not found (unexpected error, list corrupted)
+                                                // return  -5 if the List is destructed
 
 int ListDtor(List*);                            // return  0 if OK
                                                 // return -1 if List* == NULL
