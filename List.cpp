@@ -35,7 +35,10 @@ int ListAdd(List* list, Elem_t value)
         list->namber_elem == LIST_DES_POISON || 
         list->tail == LIST_DES_POISON)          return -5;
         
-    if (list->tail == -1)                       return -1;
+    if (list->tail == -1) 
+    {
+        if (ListResize(list)) return ListResize(list);
+    }
 
     int last_elem = list->buf->prev;
 
@@ -83,9 +86,13 @@ int ListInsert(List* list, Elem_t value, size_t index)
         list->namber_elem == LIST_DES_POISON || 
         list->tail == LIST_DES_POISON)          return -5;
 
-    if (list->tail == -1)                       return -1;
-    if (index > list->capacity)                 return -2;
-    if (list->buf[index].prev == -1)            return -3;
+    if (index > list->capacity)                 return -3;
+    if (list->buf[index].prev == -1)            return -4;
+
+    if (list->tail == -1) 
+    {
+        if (ListResize(list)) return ListResize(list);
+    }
 
     int elem_index  =                 list->tail;
     list->tail      = list->buf[elem_index].next;
@@ -124,6 +131,32 @@ int ListLogic_number(List* list, size_t index)
     if (search == 0) return -4;
 
     return logic_number;
+}
+
+int ListResize(List* list)
+{
+    if (list->namber_elem != list->capacity) return -2;
+
+    size_t new_capacity = list->capacity * 2;
+
+    Elem* temp_buf = (Elem*)realloc(list->buf, (new_capacity + 1)*sizeof(Elem));
+    if (temp_buf == NULL) return -1;
+
+    list->buf = temp_buf;
+
+    for (int index = (int)list->capacity + 1; index < (int)new_capacity; index++)
+    {
+        list->buf[index].next = index + 1;
+        list->buf[index].prev =        -1;
+    }
+
+    list->buf[new_capacity].next = -1;
+    list->buf[new_capacity].prev = -1;
+    list->tail  =  list->capacity + 1;
+
+    list->capacity = new_capacity;
+
+    return 0;
 }
 
 int ListDtor(List* list)
