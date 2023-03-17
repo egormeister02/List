@@ -232,23 +232,27 @@ void ListDump(List* list)
 
     ListCheck(list);
 
-    fprintf(LogList, "\n----------------------------------ListDump----------------------------------\n\n");
+    fprintf(LogList, "\n<pre>\n----------------------------------ListDump----------------------------------\n\n");
 
     fprintf(LogList, "-----------------------------------\n");
-    StatPrint_(LIST_DAMEGED,             >>>List is dameged!!!!!);
-    StatPrint_(LIST_DATA_NULL_PTR,       >>>List is dameged!!!!!);
-    StatPrint_(BAD_LOGIC,                >>>Logic_number operation troubles);
-    StatPrint_(BAD_ADD,                  >>>Add operation troubles);
-    StatPrint_(LIST_IS_DESTRUCTED,       >>>List is destructed);
-    StatPrint_(BAD_RESIZE,               >>>List has resize problem);
-    StatPrint_(CAN_NOT_ALLOCATE_MEMORY,  >>>Allocate memory problems);
-    StatPrint_(SIZE_MORETHAN_CAPACITY,   >>>List size more than capacity);
-    StatPrint_(LIST_DATA_NULL_PTR,       >>>List data pointer is null);
-    StatPrint_(BAD_CAPACITY,             >>>Incorrect list capacity);
-    StatPrint_(BAD_INSERT,               >>>Insert operation troubles);
-    StatPrint_(TOO_LONG_TAIL,            >>>Tail is more than capacity);
-    StatPrint_(RUINED_TAIL,              >>>Ruined tail);
-    StatPrint_(BAD_INDEX,                >>>Troubles in list index);
+    if (list->status == 0)
+        fprintf(LogList, "\t>>>List is OK\n");
+    else 
+    {    StatPrint_(LIST_DAMEGED,             >>>List is dameged!!!!!);
+        StatPrint_(LIST_DATA_NULL_PTR,       >>>List is dameged!!!!!);
+        StatPrint_(BAD_LOGIC,                >>>Logic_number operation troubles);
+        StatPrint_(BAD_ADD,                  >>>Add operation troubles);
+        StatPrint_(LIST_IS_DESTRUCTED,       >>>List is destructed);
+        StatPrint_(BAD_RESIZE,               >>>List has resize problem);
+        StatPrint_(CAN_NOT_ALLOCATE_MEMORY,  >>>Allocate memory problems);
+        StatPrint_(SIZE_MORETHAN_CAPACITY,   >>>List size more than capacity);
+        StatPrint_(LIST_DATA_NULL_PTR,       >>>List data pointer is null);
+        StatPrint_(BAD_CAPACITY,             >>>Incorrect list capacity);
+        StatPrint_(BAD_INSERT,               >>>Insert operation troubles);
+        StatPrint_(TOO_LONG_TAIL,            >>>Tail is more than capacity);
+        StatPrint_(RUINED_TAIL,              >>>Ruined tail);
+        StatPrint_(BAD_INDEX,                >>>Troubles in list index);
+    }
 
     fprintf(LogList, "\n    data pointer         = %p\n", list->buf);    
     fprintf(LogList, "    namber_elem          = %lu\n", list->namber_elem);
@@ -272,7 +276,7 @@ void ListDump(List* list)
         fputs((int)index == list->tail ? "    <--tail\n": "\n", LogList);
     }
 
-    fprintf(LogList, "\n---------------------------------------------------------------------------\n");
+    fprintf(LogList, "\n---------------------------------------------------------------------------\n<pre>\n");
 
     FILE* DumpFile = fopen("dump.dot", "w+");
 
@@ -292,7 +296,7 @@ void ListDump(List* list)
                       list->capacity);
 
    fprintf(DumpFile, "size [fillcolor=\"#FFFEB6\", "
-                     "label=\"SIZE = %lu\"];\n",
+                     "label=\"NAMBER OF ELEM = %lu\"];\n",
                       list->namber_elem);
     
 
@@ -302,11 +306,7 @@ void ListDump(List* list)
 
     for (size_t index = 0; index <= list->capacity; ++index)
     {
-		/*if (index == 0)		  
-			fprintf(DumpFile, "node%lu [fillcolor=\"#C0C0C0\",", index);
-		else if ((int)index == list->buf[0].next) 
-			fprintf(DumpFile, "node%lu [fillcolor=\"#FAA76C\",", index);
-		else*/ if ((int)index == list->tail) 
+		if ((int)index == list->tail) 
 			fprintf(DumpFile, "node%lu [fillcolor=\"#C1AED1\",", index);
 		else if ((int)list->buf[index].prev == -1)
 			fprintf(DumpFile, "node%lu [fillcolor=\"#98FF98\",", index);
@@ -336,7 +336,7 @@ void ListDump(List* list)
     for (size_t index = 0; index <= list->capacity; ++index)
     {
         if (list->buf[index].next != -1)
-            fprintf(DumpFile, "node%lu: <n> -> node%d: <n>;\n", index, list->buf[index].next);
+            fprintf(DumpFile, "node%lu: <n> -> node%d: <i> ;\n", index, list->buf[index].next);
         if (list->buf[index].prev != -1)
             fprintf(DumpFile, "node%lu: <p> -> node%d: <p> ;\n", index, list->buf[index].prev);
         fprintf(DumpFile, "\n");
@@ -358,7 +358,7 @@ void ListDump(List* list)
     sprintf(buff, "dot -Tsvg -o %s dump.dot", dumpName);
     system(buff);
 
-    fprintf(LogList, "<img src = %s>\n", dumpName + 4);
+    fprintf(LogList, "<img src = %s>\n", dumpName);
     ++pngIndex;
 
 
@@ -374,5 +374,5 @@ FILE* StartLog(void)
 void MakePngName(char* name, char num)
 {
 	
-	sprintf(name, "obj/dump%03d.svg", num);
+	sprintf(name, "dot_files/dump%03d.svg", num);
 } 

@@ -55,7 +55,7 @@ struct List
 };
 
 
-const char NAME_LOG_FILE[] =   "LogList.log";
+const char NAME_LOG_FILE[] =   "ListLog.html";
 const int  LIST_DES_POISON =     -0xCFDEADFC;
 
 int ListCtor(List*, size_t);                    // return   0 if OK
