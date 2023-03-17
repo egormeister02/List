@@ -6,8 +6,6 @@ int main()
 
     ListCtor(&list, 10);
 
-    ListDump(&list);
-
     for (int i = 0; i < 15; i++)
     {
         
@@ -15,12 +13,6 @@ int main()
     }
 
     ListDump(&list);
-
-    printf("%d\n", ListDelete(&list, 5));
-
-    ListDump(&list);
-
-    printf("%d\n", ListLogic_number(&list, 6));
 
 
     return 0;
