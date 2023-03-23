@@ -135,6 +135,46 @@ int ListLogic_number(List* list, size_t index)
     return logic_number;
 }
 
+int ListPhysic_number(List* list, size_t logic_num)
+{
+    ASSERT_OK(list, BAD_PHYSIC);
+
+    if (logic_num > list->namber_elem) return -1;
+
+    size_t physic_num = 0;
+
+    for (size_t counter = 0; counter < logic_num; counter++)
+    {
+        physic_num = (size_t)list->buf[physic_num].next;
+    }
+
+    return (int)physic_num;
+}
+
+size_t* ListPhysic_Logic_Array(List* list)
+{
+    if (ListCheck(list))
+    {
+        list->status |= BAD_ARRAY;
+        ListDump(list);
+        return (size_t*)LIST_POISON_PTR;
+    }
+
+    size_t* array = (size_t*)calloc(list->namber_elem + 1, sizeof(size_t));
+    if (array == NULL) return array;
+
+    size_t phusic_num = 0;
+    size_t number_elem = list->namber_elem;
+
+    for (size_t logic_num = 0; logic_num <= number_elem; logic_num++)
+    {
+        array[logic_num] = phusic_num;
+        phusic_num = (size_t)list->buf[phusic_num].next;
+    }
+
+    return array;
+}
+
 int ListResize(List* list)
 {
     ASSERT_OK(list, BAD_RESIZE);
@@ -238,7 +278,8 @@ void ListDump(List* list)
     if (list->status == 0)
         fprintf(LogList, "\t>>>List is OK\n");
     else 
-    {    StatPrint_(LIST_DAMEGED,             >>>List is dameged!!!!!);
+    {   
+        StatPrint_(LIST_DAMEGED,             >>>List is dameged!!!!!);
         StatPrint_(LIST_DATA_NULL_PTR,       >>>List is dameged!!!!!);
         StatPrint_(BAD_LOGIC,                >>>Logic_number operation troubles);
         StatPrint_(BAD_ADD,                  >>>Add operation troubles);
@@ -252,6 +293,9 @@ void ListDump(List* list)
         StatPrint_(TOO_LONG_TAIL,            >>>Tail is more than capacity);
         StatPrint_(RUINED_TAIL,              >>>Ruined tail);
         StatPrint_(BAD_INDEX,                >>>Troubles in list index);
+        StatPrint_(BAD_LOGIC,                >>>Troubles in list index);
+        StatPrint_(BAD_PHYSIC,               >>>Troubles in list index);
+        StatPrint_(BAD_ARRAY,                >>>Troubles in list index);
     }
 
     fprintf(LogList, "\n    data pointer         = %p\n", list->buf);    

@@ -1,19 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
- #define ASSERT_OK(list, BAD_FUNC)                      \
-        if (ListCheck(list))                            \
-        {                                               \
-            list->status |= BAD_FUNC;                   \
-            ListDump(list);                             \
-            return -5;                                  \
-        } 
+#define CHECKING 1
 
-#define StatPrint_(STATUS,text)         \
-if (list->status & STATUS)              \
-{                                       \
- fprintf(LogList, "\t"#text "\n");          \
-}
+#if CHECKING
+    #define ASSERT_OK(list, BAD_FUNC)                       \
+            if (ListCheck(list))                            \
+            {                                               \
+                list->status |= BAD_FUNC;                   \
+                ListDump(list);                             \
+                return -5;                                  \
+            } 
+#else
+    #define ASSERT_OK(list, BAD_FUNC) ;
+#endif
+
+#define StatPrint_(STATUS,text)                 \
+    if (list->status & STATUS)                  \
+    {                                           \
+        fprintf(LogList, "\t"#text "\n");       \
+    }
                                 
 
 typedef int Elem_t;
@@ -35,7 +41,9 @@ enum ListStatus
     BAD_INDEX               = 1 << 11, 
     LIST_DAMEGED            = 1 << 12,
     BAD_ADD                 = 1 << 13,
-    BAD_LOGIC               = 1 << 14
+    BAD_LOGIC               = 1 << 14,
+    BAD_PHYSIC              = 1 << 15,
+    BAD_ARRAY               = 1 << 16
 };
 
 struct Elem
@@ -55,8 +63,9 @@ struct List
 };
 
 
-const char NAME_LOG_FILE[] =   "ListLog.html";
-const int  LIST_DES_POISON =     -0xCFDEADFC;
+const char    NAME_LOG_FILE[] =     "ListLog.html";
+const int     LIST_DES_POISON =        -0xCFDEADFC;
+const size_t LIST_POISON_PTR  = 0xFFFFFFDEADFFFFFF;
 
 int ListCtor(List*, size_t);                    // return   0 if OK
                                                 // return  -1 if List* == NULL
@@ -94,6 +103,14 @@ int ListResize(List*);                          // return   0 if OK
                                                 // return  -1 if could not allocate memory
                                                 // return  -2 if list->namber_elem != list->capacity (unexpected error, list damaged)
                                                 // return  -5 if the list is dameged, check LogFile
+
+int ListPhysic_number(List*, size_t logic_num);    // return   physic index of element at logic number "logic_num" if OK (0 <= Physic_index <= number_elem)
+                                                // return  -1 if there in no element with this login number
+                                                // return  -5 if the list is dameged, check LogFile
+
+size_t* ListPhysic_Logic_Array(List*);              // return   pointer to array where index = logic number, value = physic index
+                                                // return  NULL if could not allocate memory
+                                                // return  LIST_POISON_PTR if the list is dameged, check LogFile
 
 int ListCheck(List*);
 
