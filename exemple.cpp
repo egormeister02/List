@@ -20,10 +20,14 @@ int main()
     ListDump(&list);
 
     size_t* arr = ListPhysic_Logic_Array(&list);
-    for (int i = 0; i <= list.namber_elem; i++)
+    for (int i = 0; i <= list.number_elem; i++)
     {
         printf("[%02d] = %lu\n", i, arr[i]);
-    };
+    }
+
+    ListLineariz(&list);
+
+    ListDump(&list);
 
 
     return 0;

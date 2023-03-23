@@ -31,7 +31,7 @@ enum ListStatus
     LIST_DATA_NULL_PTR      = 1 << 1,
     CAN_NOT_ALLOCATE_MEMORY = 1 << 2,
     LIST_IS_DESTRUCTED      = 1 << 3,
-    BAD_RESIZE              = 1 << 4,
+    BAD_RESIZE_UP           = 1 << 4,
     BAD_CAPACITY            = 1 << 5,
     BAD_INSERT              = 1 << 6,
     BAD_DELETE              = 1 << 7,
@@ -43,7 +43,8 @@ enum ListStatus
     BAD_ADD                 = 1 << 13,
     BAD_LOGIC               = 1 << 14,
     BAD_PHYSIC              = 1 << 15,
-    BAD_ARRAY               = 1 << 16
+    BAD_ARRAY               = 1 << 16,
+    BAD_LINEAR              = 1 << 17
 };
 
 struct Elem
@@ -58,7 +59,7 @@ struct List
     int         status   =    0;
     Elem*  buf           = NULL;
     int    tail          =    0;
-    size_t namber_elem   =    0;
+    size_t number_elem   =    0;
     size_t capacity      =    0;
 };
 
@@ -99,18 +100,23 @@ int ListLogic_number(List*, size_t index);      // return logical number of elem
 int ListDtor(List*);                            // return   0 if OK
                                                 // return  -1 if List* == NULL
 
-int ListResize(List*);                          // return   0 if OK
+int ListResizeUp(List*);                        // return   0 if OK
                                                 // return  -1 if could not allocate memory
-                                                // return  -2 if list->namber_elem != list->capacity (unexpected error, list damaged)
+                                                // return  -2 if list->number_elem != list->capacity (unexpected error, list damaged)
                                                 // return  -5 if the list is dameged, check LogFile
 
-int ListPhysic_number(List*, size_t logic_num);    // return   physic index of element at logic number "logic_num" if OK (0 <= Physic_index <= number_elem)
+int ListPhysic_number(List*, size_t logic_num); // return   physic index of element at logic number "logic_num" if OK (0 <= Physic_index <= number_elem)
                                                 // return  -1 if there in no element with this login number
                                                 // return  -5 if the list is dameged, check LogFile
 
-size_t* ListPhysic_Logic_Array(List*);              // return   pointer to array where index = logic number, value = physic index
+size_t* ListPhysic_Logic_Array(List*);          // return   pointer to array where index = logic number, value = physic index
                                                 // return  NULL if could not allocate memory
                                                 // return  LIST_POISON_PTR if the list is dameged, check LogFile
+
+int ListLineariz(List*);                        // Linearizes the list
+                                                // return   0 if OK
+                                                // return -1 if could not allocate memory     
+                                                // return  -5 if the list is dameged, check LogFile                 
 
 int ListCheck(List*);
 

@@ -29,7 +29,7 @@ int ListCtor(List* list, size_t capacity)
     list->buf[list->capacity].next = -1;
     list->buf[list->capacity].prev = -1;
 
-    list->namber_elem = 0;
+    list->number_elem = 0;
 
     return 0; 
 }
@@ -40,7 +40,7 @@ int ListAdd(List* list, Elem_t value)
         
     if (list->tail == -1) 
     {
-        if (ListResize(list)) return ListResize(list);
+        if (ListResizeUp(list)) return ListResizeUp(list);
     }
 
     int last_elem = list->buf->prev;
@@ -56,7 +56,7 @@ int ListAdd(List* list, Elem_t value)
 
     list->buf->prev = last_elem;
     
-    list->namber_elem ++;
+    list->number_elem ++;
     
     return last_elem;
 }
@@ -76,7 +76,7 @@ Elem_t ListDelete(List* list, size_t index)
     list->buf[index].next   = list->tail;
     list->tail              = (int)index;
 
-    list->namber_elem --;
+    list->number_elem --;
 
     return list->buf[index].data;
 }
@@ -90,7 +90,7 @@ int ListInsert(List* list, Elem_t value, size_t index)
 
     if (list->tail == -1) 
     {
-        if (ListResize(list)) return ListResize(list);
+        if (ListResizeUp(list)) return ListResizeUp(list);
     }
 
     int elem_index  =                 list->tail;
@@ -102,7 +102,7 @@ int ListInsert(List* list, Elem_t value, size_t index)
     list->buf[elem_index].prev              =              (int)index;
     list->buf[elem_index].data              =                   value;
 
-    list->namber_elem ++;
+    list->number_elem ++;
 
     return elem_index;
 
@@ -139,7 +139,7 @@ int ListPhysic_number(List* list, size_t logic_num)
 {
     ASSERT_OK(list, BAD_PHYSIC);
 
-    if (logic_num > list->namber_elem) return -1;
+    if (logic_num > list->number_elem) return -1;
 
     size_t physic_num = 0;
 
@@ -160,11 +160,11 @@ size_t* ListPhysic_Logic_Array(List* list)
         return (size_t*)LIST_POISON_PTR;
     }
 
-    size_t* array = (size_t*)calloc(list->namber_elem + 1, sizeof(size_t));
+    size_t* array = (size_t*)calloc(list->number_elem + 1, sizeof(size_t));
     if (array == NULL) return array;
 
     size_t phusic_num = 0;
-    size_t number_elem = list->namber_elem;
+    size_t number_elem = list->number_elem;
 
     for (size_t logic_num = 0; logic_num <= number_elem; logic_num++)
     {
@@ -175,11 +175,58 @@ size_t* ListPhysic_Logic_Array(List* list)
     return array;
 }
 
-int ListResize(List* list)
+int ListLineariz(List* list)
 {
-    ASSERT_OK(list, BAD_RESIZE);
+    ASSERT_OK(list, BAD_LINEAR);
 
-    if (list->namber_elem != list->capacity) 
+    Elem_t* arr_value = (Elem_t*)calloc(list->number_elem + 1, sizeof(Elem_t));
+    if (arr_value == NULL) return -1;
+
+    size_t number_elem = list->number_elem;
+    size_t physic_index = 0;
+
+    for (size_t logic_num = 0; logic_num <= number_elem; logic_num++)
+    {
+        arr_value[logic_num] = list->buf[physic_index].data;
+        physic_index = (size_t)list->buf[physic_index].next;
+    }
+
+    list->buf->data =     arr_value[0];
+    list->buf->next =                1;
+    list->buf->prev = (int)number_elem;
+
+    for (size_t index = 1; index < number_elem; index++)
+    {
+        list->buf[index].data = arr_value[index];
+        list->buf[index].next =   (int)index + 1;
+        list->buf[index].prev =   (int)index - 1;
+    }
+
+    list->buf[number_elem].data =    arr_value[number_elem];
+    list->buf[number_elem].next =                         0;
+    list->buf[number_elem].prev =      (int)number_elem - 1;
+
+    size_t capacity = list->capacity;
+
+    for (size_t index = number_elem + 1; index < capacity; index++)
+    {
+        list->buf[index].next = (int)index + 1;
+        list->buf[index].prev =             -1;
+    }
+
+    list->buf[capacity].next   =  -1;
+    list->buf[capacity].prev   =  -1;
+
+    list->tail = (int)number_elem + 1;
+
+    return 0;
+}
+
+int ListResizeUp(List* list)
+{
+    ASSERT_OK(list, BAD_RESIZE_UP);
+
+    if (list->number_elem != list->capacity) 
     {
         list->status |= LIST_DAMEGED;
         ListDump(list);
@@ -218,7 +265,7 @@ int ListDtor(List* list)
     if (list == NULL) return -1;
 
     list->capacity = LIST_DES_POISON;
-    list->namber_elem = LIST_DES_POISON;
+    list->number_elem = LIST_DES_POISON;
     list->tail = LIST_DES_POISON;
 
     free(list->buf);
@@ -234,7 +281,7 @@ int ListCheck(List* list)
         return LIST_NULL_PTR;
 
     if (list->capacity == LIST_DES_POISON    || 
-        list->namber_elem == LIST_DES_POISON || 
+        list->number_elem == LIST_DES_POISON || 
         list->tail == LIST_DES_POISON)  
     {
         list->status |= LIST_IS_DESTRUCTED;
@@ -246,7 +293,7 @@ int ListCheck(List* list)
     if (list->capacity <= 0)
         status |= BAD_CAPACITY;
 
-    if (list->namber_elem > list->capacity)
+    if (list->number_elem > list->capacity)
         status |= SIZE_MORETHAN_CAPACITY;
 
     if (list->tail > (int)list->capacity)
@@ -284,7 +331,7 @@ void ListDump(List* list)
         StatPrint_(BAD_LOGIC,                >>>Logic_number operation troubles);
         StatPrint_(BAD_ADD,                  >>>Add operation troubles);
         StatPrint_(LIST_IS_DESTRUCTED,       >>>List is destructed);
-        StatPrint_(BAD_RESIZE,               >>>List has resize problem);
+        StatPrint_(BAD_RESIZE_UP,            >>>List has resize problem);
         StatPrint_(CAN_NOT_ALLOCATE_MEMORY,  >>>Allocate memory problems);
         StatPrint_(SIZE_MORETHAN_CAPACITY,   >>>List size more than capacity);
         StatPrint_(LIST_DATA_NULL_PTR,       >>>List data pointer is null);
@@ -299,7 +346,7 @@ void ListDump(List* list)
     }
 
     fprintf(LogList, "\n    data pointer         = %p\n", list->buf);    
-    fprintf(LogList, "    namber_elem          = %lu\n", list->namber_elem);
+    fprintf(LogList, "    number_elem          = %lu\n", list->number_elem);
     fprintf(LogList, "    capacity             = %lu\n", list->capacity); 
     fprintf(LogList, "    tail                 = %d\n", list->tail);
 
@@ -341,7 +388,7 @@ void ListDump(List* list)
 
    fprintf(DumpFile, "size [fillcolor=\"#FFFEB6\", "
                      "label=\"NAMBER OF ELEM = %lu\"];\n",
-                      list->namber_elem);
+                      list->number_elem);
     
 
     fprintf(DumpFile, "node [color=black, shape=record, style=\"rounded, filled\"];\n");
