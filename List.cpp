@@ -238,7 +238,7 @@ int ListResizeUp(List* list)
     Elem* temp_buf = (Elem*)realloc(list->buf, (new_capacity + 1)*sizeof(Elem));
     if (temp_buf == NULL) 
     {
-        list->status |= CAN_NOT_ALLOCATE_MEMORY;
+        list->status |= CAN_NOT_ALLOCATE_MEMORY | BAD_RESIZE_UP;
         ListDump(list);
         return -1;
     }
@@ -256,6 +256,29 @@ int ListResizeUp(List* list)
     list->tail = (int)list->capacity + 1;
 
     list->capacity = new_capacity;
+
+    return 0;
+}
+
+int ListResizeDown(List* list)
+{
+    ASSERT_OK(list, BAD_RESIZE_DOWN);
+
+    if (list->number_elem == list->capacity) return -1;
+
+    if (ListLineariz(list)) return ListLineariz(list);
+
+    Elem* temp_buf = (Elem*)realloc(list->buf, (list->number_elem + 1)*sizeof(Elem));
+    if (temp_buf == NULL) 
+    {
+        list->status |= CAN_NOT_ALLOCATE_MEMORY | BAD_RESIZE_DOWN;
+        ListDump(list);
+        return -2;
+    }
+
+    list->capacity = list->number_elem;
+    list->tail = -1;
+    list->buf = temp_buf;
 
     return 0;
 }
@@ -435,7 +458,7 @@ void ListDump(List* list)
 
     fprintf(DumpFile, "\n edge [style=bold, constraint=false];\n");
 
-    fprintf(DumpFile, "tail     -> node%d; \n", list->tail );
+    if (list->tail >= 0) fprintf(DumpFile, "tail     -> node%d; \n", list->tail );
 
     fprintf(DumpFile, "}\n");
     

@@ -44,7 +44,8 @@ enum ListStatus
     BAD_LOGIC               = 1 << 14,
     BAD_PHYSIC              = 1 << 15,
     BAD_ARRAY               = 1 << 16,
-    BAD_LINEAR              = 1 << 17
+    BAD_LINEAR              = 1 << 17,
+    BAD_RESIZE_DOWN         = 1 << 18
 };
 
 struct Elem
@@ -103,6 +104,11 @@ int ListDtor(List*);                            // return   0 if OK
 int ListResizeUp(List*);                        // return   0 if OK
                                                 // return  -1 if could not allocate memory
                                                 // return  -2 if list->number_elem != list->capacity (unexpected error, list damaged)
+                                                // return  -5 if the list is dameged, check LogFile
+
+int ListResizeDown(List*);                      // return   0 if OK                                                
+                                                // return  -1 if list don't need Resize down
+                                                // return  -2 if could not allocate memory
                                                 // return  -5 if the list is dameged, check LogFile
 
 int ListPhysic_number(List*, size_t logic_num); // return   physic index of element at logic number "logic_num" if OK (0 <= Physic_index <= number_elem)

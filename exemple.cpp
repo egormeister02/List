@@ -25,7 +25,7 @@ int main()
         printf("[%02d] = %lu\n", i, arr[i]);
     }
 
-    ListLineariz(&list);
+    ListResizeDown(&list);
 
     ListDump(&list);
 
